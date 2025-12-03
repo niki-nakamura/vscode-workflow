@@ -1,46 +1,27 @@
-素晴らしいアイデアです。ここまでの苦労と解決策をドキュメント化しておけば、自分だけでなくチームメンバーへの共有にも非常に役立ちます。
+ご提示いただいた最新情報（Codexのモデル選び、クラウド側からの同期方法など）をすべて反映させた、**完全版の README.md** を作成しました。
 
-Githubにそのまま貼り付けて使える構成を作成しました。
-
-### リポジトリ構成案
-
-  * **Repository Name:** `gas-vscode-codex-workflow`
-  * **Description:** VS Code と ChatGPT (Codex) を活用した Google Apps Script の効率的な修正・運用フロー
+これをコピーして、VS Codeの `README.md` に上書き保存してください。
 
 -----
-
-### ファイル構成
-
-リポジトリには以下の3つのファイルを含めることを推奨します。
-
-1.  **`README.md`** （手順書本体）
-2.  **`.gitignore`** （Git管理から除外する設定）
-3.  **`.claspignore`** （Googleドライブへのアップロードから除外する設定）
-
-以下、それぞれのファイルの中身です。コピーして作成してください。
-
------
-
-#### 1\. README.md
-
-※ これがマニュアル本体です。
 
 ````markdown
 # VS Code + ChatGPT (Codex) による GAS 開発・運用ガイド
 
-このリポジトリは、Google Apps Script (GAS) を VS Code 上でローカル管理し、OpenAI の ChatGPT 拡張機能 (Codex) を用いて効率的に修正・運用するための手順書です。
+Google Apps Script (GAS) を VS Code 上でローカル管理し、OpenAI の最新コーディングAI (Codex) を活用して効率的に修正・運用するための手順書です。
 
 ## 📋 前提条件
 
-* **Node.js** がインストールされていること
-* **VS Code** がインストールされていること
-* **Google アカウント** (GAS権限あり)
-* **OpenAI アカウント** (ChatGPT Plus 推奨)
+* **Node.js**: インストール済みであること
+* **VS Code**: 拡張機能「Codex - OpenAI's coding agent」を導入済みであること
+* **Google アカウント**: GAS 編集権限があること
+* **OpenAI アカウント**: ChatGPT Plus/Pro/Team などの有料プラン（API従量課金ではなく、プラン内で利用可能）
 
-## 🛠 1. 初回セットアップ (環境構築)
+---
+
+## 🛠 1. 環境構築 (初回のみ)
 
 ### 1-1. clasp のインストール
-GAS をローカルで管理するための Google 公式ツール `clasp` をインストールします。
+GAS をローカルで管理するための Google 公式ツールをインストールします。
 
 ```bash
 npm install -g @google/clasp
@@ -48,53 +29,56 @@ npm install -g @google/clasp
 
 ### 1-2. Google ログイン
 
-以下のコマンドを実行し、ブラウザで認証を行います。
+ブラウザ認証を行い、PC と Google アカウントを紐付けます。
 
 ```bash
 clasp login
 ```
 
-### 1-3. VS Code 拡張機能の導入
+### 1-3. プロジェクトの取得 (Clone)
 
-VS Code に以下の拡張機能をインストールし、OpenAI アカウントでサインインします。
+GAS の「プロジェクト設定」にある **スクリプトID** をコピーし、以下のコマンドでダウンロードします。
 
-  * **Extension Name:** Codex - OpenAI's coding agent
-  * **Publisher:** OpenAI
+```bash
+# フォルダ作成
+mkdir my-gas-project
+cd my-gas-project
+
+# コードのダウンロード
+clasp clone <スクリプトID>
+```
+
+> **⚠️ Windows ユーザーの注意**: GAS 上のファイル名に `*` `?` `/` などの記号が含まれているとダウンロードに失敗します。事前にブラウザ上の GAS エディタでファイル名を変更してください。
 
 -----
 
-## 🚀 2. 開発フロー
+## 🔄 2. 日々の開発フロー
 
-### Step 1: プロジェクトの取得 (Clone)
+### Step 1: 最新状態の同期 (Pull)
 
-既存の GAS プロジェクトをローカルにダウンロードします。
+作業を始める前や、ブラウザ側で誰かが修正を行った場合は、必ず手元のコードを更新します。
+**※注意: 手元で保存していない変更がある状態で実行すると、上書きされて消える可能性があります。**
 
-1.  作業用フォルダを作成し、移動します。
-    ```bash
-    mkdir my-gas-project
-    cd my-gas-project
-    ```
-2.  GAS の「プロジェクト設定」から **スクリプトID** をコピーします。
-3.  以下のコマンドでダウンロードします。
-    ```bash
-    clasp clone <スクリプトID>
-    ```
+```bash
+clasp pull
+```
 
 ### Step 2: VS Code で編集 & AI 活用
 
-ダウンロードしたフォルダを VS Code で開きます。
+ファイルを開き、修正を行います。右側の Codex チャットパネルを活用してください。
 
-```bash
-code .
-```
+#### 🤖 AIモデルの選び方
 
-  * **AI への修正依頼:** 修正したいコードを選択し、右側の ChatGPT パネルで指示を出します（例：「この関数のエラー処理を追加して」「ロジックを○○に変更して」）。
-  * **コード保存:** 修正後は `Ctrl + S` で保存します。
+チャット欄のモデル選択プルダウンから用途に合わせて選択します。
+
+  * **GPT-5.1-Codex-Max**: **推奨**。複雑なロジック解析、バグ修正、大規模なリファクタリングに最適。
+  * **GPT-5.1-Codex-Mini**: 高速。コメント追加や単純な構文修正向け。
+  * **GPT-5.1-Codex**: 標準モデル。
 
 ### Step 3: クラウドへの反映 (Push)
 
-ローカルでの修正内容を Google のサーバー（GASエディタ）に反映させます。
-**※これを忘れると動きません。**
+修正が終わったら、以下のコマンドで Google のサーバーへアップロードします。
+**これを実行しないと、実際の GAS は更新されません。**
 
 ```bash
 clasp push
@@ -102,70 +86,48 @@ clasp push
 
 -----
 
-## ⚠️ 注意点とトラブルシューティング
+## ⚠️ トラブルシューティング
 
-### ファイル名の制限 (Windows)
+### Q. 「拡張機能が見つからない」と言われた
 
-GAS 上でファイル名に `*` (アスタリスク) や `/` (スラッシュ) が含まれていると、Windows 環境への Clone 時にエラーになります。
+`clasp` は VS Code の拡張機能ではなく、ターミナルで動くツールです。コマンドライン（ターミナル）から操作してください。
 
-  * **対策:** ブラウザ上の GAS エディタで、記号を含まないファイル名に変更してから `clasp clone` してください。
+### Q. アップロード (Push) を忘れて動かない
 
-### コンフリクトの回避
+VS Code で「保存 (Ctrl+S)」しただけでは GAS に反映されません。必ず `clasp push` を行ってください。
 
-複数人で作業する場合や、ブラウザ上でも直接編集した場合は、作業前に必ず最新版を取得してください。
+### Q. 認証エラーが出る
 
-```bash
-clasp pull
+長期間使用していない場合、認証が切れることがあります。その際は再度 `clasp login` を実行してください。
+
+-----
+
+## 📂 除外設定 (.claspignore)
+
+`.git` フォルダなどが Google ドライブにアップロードされないよう、プロジェクトルートに `.claspignore` ファイルを作成し、以下を記述してあります。
+
+```text
+.git/
+.gitignore
+README.md
+.vscode/
+node_modules/
 ```
-
-## 📂 除外設定について
-
-  * `.clasp.json` はスクリプトIDを含むため、プライベートリポジトリ以外では公開しないよう注意してください（`.gitignore` 推奨）。
-  * `.git` ディレクトリなどは GAS 側にアップロードされないよう `.claspignore` に設定します。
-
-<!-- end list -->
 
 ````
 
 ---
 
-#### 2. .gitignore
-※ 余計なファイルや設定ファイルをGitに上げないための設定です。
+### 作業手順
+1.  VS Codeで `README.md` を開きます。
+2.  中身をすべて消して、上記のコードを貼り付けます。
+3.  保存 (`Ctrl + S`) します。
+4.  ターミナルで以下を実行して GitHub に更新を反映させます。
 
-```text
-# Node modules
-node_modules/
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Clasp settings (セキュリティのためリポジトリには含めない運用が一般的)
-.clasp.json
+```powershell
+git add README.md
+git commit -m "Update README with latest Codex and sync instructions"
+git push
 ````
 
------
-
-#### 3\. .claspignore
-
-※ `.git` などの不要なファイルをGoogleドライブ（GAS側）にアップロードしないための設定です。
-
-```text
-# Ignore Git files
-.git/
-.gitignore
-README.md
-
-# Ignore VS Code settings
-.vscode/
-
-# Other
-node_modules/
-```
-
------
-
-### 次のアクション
-
-今のローカルフォルダ（`my-gas-project`）をそのままこのGitリポジトリとして初期化してGithubへアップロードしますか？
-その場合、VS CodeのターミナルでGitの初期化コマンドをご案内します。
+これでドキュメントも最新の状態になります！
