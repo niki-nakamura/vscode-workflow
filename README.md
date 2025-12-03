@@ -4,7 +4,6 @@
 
 -----
 
-````markdown
 # VS Code + ChatGPT (Codex) による GAS 開発・運用ガイド
 
 Google Apps Script (GAS) を VS Code 上でローカル管理し、OpenAI の最新コーディングAI (Codex) を活用して効率的に修正・運用するための手順書です。
@@ -25,7 +24,6 @@ GAS をローカルで管理するための Google 公式ツールをインス�
 
 ```bash
 npm install -g @google/clasp
-````
 
 ### 1-2. Google ログイン
 
