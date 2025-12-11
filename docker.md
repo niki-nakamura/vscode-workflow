@@ -3,7 +3,6 @@
 
 ---
 
-````md
 # llmo-platform ローカル閲覧・起動手順（Windows）
 
 本ドキュメントは、**GMO 組織の Private Repository「llmo-platform」** を
@@ -31,7 +30,6 @@
 
 安心してローカル環境の起動・コードの閲覧を行って問題ありません。
 
----
 
 ## 1. 前提条件
 
