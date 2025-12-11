@@ -1,4 +1,4 @@
-# llmo-platform ローカル閲覧・起動手順（Windows / 初心者向け）
+# llmo-platform ローカル閲覧・起動手順（Windows）
 
 本ドキュメントは、**GMO 組織の Private Repository「llmo-platform」** を
 自分の PC にクローンし、VS Code でコードを閲覧しつつ、
