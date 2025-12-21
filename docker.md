@@ -1,95 +1,93 @@
+
 # llmo-platform ローカル閲覧・起動手順（Windows）
 
-本ドキュメントは、**GMO 組織の Private Repository「llmo-platform」** を  
-自分の PC にクローンし、VS Code でコードを閲覧しつつ、  
-ローカル環境（Dashboard / Admin / API）を起動するまでの手順をまとめたものです。
+本ドキュメントは、
+**GMO 組織の Private Repository「llmo-platform」** を
+**自分の PC にクローンしてコードを参照できる状態にすること**を第一目的とし、
+必要に応じて **ローカル起動まで進められる** 手順をまとめたものです。
 
-> ✅ 前提：**本手順で行う操作は、本番環境には一切影響しません。**  
-> ✅ API キーや本番クレデンシャルがないため、OpenAI / Firecrawl / GA4 等の **課金は発生しません**。
+> ✅ 本手順は **ローカル閲覧・検証専用** です
+> ✅ **本番環境・課金・データには一切影響しません**
+> ✅ まずは *clone → VS Code で閲覧* だけで完結して問題ありません
 
 ---
 
-## 0. 安全性について（本番や課金への影響）
+## 0. 安全性について（重要）
 
-- この手順で扱うのは **自分の PC 上のローカル環境のみ** です。
-- `git clone` で取得したコードは **読み取り専用のコピー** であり、本番サーバーには何も送信されません。
-- OpenAI / Firecrawl / GA4 / Firebase などの **API キーはリポジトリに含まれていません**。
-  - `.env` や Service Account JSON など、本番用クレデンシャルがないため、外部 API へ認証付きリクエストを送ることはできません。
-  - したがって **API 課金は発生しません**。
-- 本番に影響を与えるには
-  1. GitHub の main / develop へ Push する権限
-  2. Cloud Build / Cloud Run のデプロイ権限  
-     が必要ですが、閲覧専用ユーザーには付与されていません。
+* `git clone` で取得するのは **コードのコピー** です
+  → 本番サーバーやクラウドへは **一切アクセスしません**
+* リポジトリには以下は **含まれていません**
 
-安心してローカル環境の起動・コードの閲覧を行って問題ありません。
+  * OpenAI / Firecrawl / GA4 / Firebase 等の API キー
+  * 本番用 `.env`
+  * Service Account JSON
+* 認証情報が無いため
+
+  * 外部 API への **認証付き通信は不可**
+  * **課金は発生しません**
+* GitHub 権限が **Read のみ** の場合
+
+  * Push / Deploy / 本番反映は **不可能**
+
+👉 **安心して閲覧・ローカル実行して問題ありません**
 
 ---
 
 ## 1. 前提条件
 
-### 1-1. 権限
+ 1-1. 権限
 
-- GitHub 組織 `gmo-am` の Private Repo  
-  `gmo-am/llmo-platform` に **Read 権限** が付与されていること
-  - Fork や Push 権限は不要（なくてもよい）
+* GitHub 組織 `gmo-am`
+* Private Repository
+  **`gmo-am/llmo-platform` に Read 権限**
 
-### 1-2. インストールしておくソフトウェア
-
-Windows PC 上で、次のツールをインストールしておくこと：
-
-1. **Git for Windows**  
-   https://git-scm.com/download/win
-
-2. **Visual Studio Code**  
-   https://code.visualstudio.com/
-
-3. **Node.js 22 系**  
-   https://nodejs.org/  
-   （推奨：LTS またはチーム指定バージョン）
-
-4. **pnpm**
-
-   ```powershell
-   corepack enable
-   corepack prepare pnpm@latest --activate
-　　````
-
-5. **Docker Desktop for Windows**
-
-   * [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
-   * インストール時に **WSL2 backend を有効化** しておく
-
-6. **WSL2（Windows Subsystem for Linux）**
-
-   * 管理者 PowerShell で以下を実行し、再起動：
-
-     ```powershell
-     wsl --install
-     ```
+※ Fork / Push 権限は不要
 
 ---
 
-## 2. リポジトリをクローンする（Pull）
+ 1-2. 事前インストール（最低限）
 
-### 2-1. PowerShell を開く
+> 🔰 **閲覧だけなら ①② だけで OK**
 
-* Windows キー → 「PowerShell」と入力 → 起動
+1. **Git for Windows**
+   [https://git-scm.com/download/win](https://git-scm.com/download/win)
 
-### 2-2. 作業ディレクトリへ移動
+2. **Visual Studio Code**
+   [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
-ここでは `Documents` 配下に配置する例：
+（以下は *起動したい場合のみ*）
+3. Node.js 22 系
+4. pnpm
+5. Docker Desktop（WSL2 有効）
+6. WSL2
+
+---
+
+## 2. リポジトリをクローンする
+
+ 2-1. PowerShell を起動
+
+Windows キー → `PowerShell`
+
+---
+
+ 2-2. 作業ディレクトリへ移動
+
+例（Documents 配下）：
 
 ```powershell
 cd "C:\Users\<YourUserName>\Documents"
 ```
 
-※ あなたの環境の例：
+あなたの環境例：
 
 ```powershell
-cd "C:\Users\usr0302434\Documents"
+cd "C:\Users\xnakamura\Documents"
 ```
 
-### 2-3. llmo-platform をクローン（Pull）
+---
+
+ 2-3. クローン
 
 ```powershell
 git clone https://github.com/gmo-am/llmo-platform.git
@@ -98,213 +96,182 @@ git clone https://github.com/gmo-am/llmo-platform.git
 成功すると以下の構造になります：
 
 ```text
-C:\Users\<YourUserName>\Documents\
-  └─ llmo-platform\
-      ├─ apis\
-      ├─ apps\
-      ├─ infrastructure\
-      ├─ local-env\
-      ├─ packages\
-      ├─ scripts\
-      ├─ README.md
-      └─ ...
+llmo-platform/
+ ├─ apis/
+ ├─ apps/
+ ├─ packages/
+ ├─ local-env/
+ ├─ infrastructure/
+ ├─ scripts/
+ └─ README.md
 ```
 
 ---
 
-## 3. VS Code で llmo-platform を開く
+## 3. すでに clone 済みの場合（よくあるエラー）
 
-### 3-1. PowerShell から VS Code を起動（推奨）
+ ❌ エラー例
+
+```text
+fatal: destination path 'llmo-platform' already exists and is not an empty directory.
+```
+
+ ✔ 対処方法
+
+すでに clone 済みです。**再 clone は不要**です。
 
 ```powershell
-cd "C:\Users\<YourUserName>\Documents\llmo-platform"
+cd llmo-platform
+```
+
+中身を確認：
+
+```powershell
+git status
+```
+
+```text
+On branch main
+nothing to commit, working tree clean
+```
+
+→ 正常です 👍
+
+---
+
+## 4. VS Code でリポジトリを開く（閲覧目的）
+
+ 4-1. PowerShell から起動（推奨）
+
+```powershell
+cd llmo-platform
 code .
 ```
 
-* 新しい VS Code ウィンドウが開き、タイトルバーに
-  `llmo-platform — Visual Studio Code`
-  と表示されていれば成功。
+ 4-2. 確認ポイント
 
-### 3-2. VS Code 上での確認
+* VS Code タイトルに
+  **`llmo-platform — Visual Studio Code`**
+* 左ペイン（Explorer）に
 
-* 左のアクティビティバーで **Source Control（Git アイコン）** を押すと
-  `apis/` や `apps/` など各ディレクトリが一覧表示される。
-* Explorer が空に見える場合でも、Source Control にディレクトリが表示されていれば
-  **プロジェクトは問題なく開けています**。
-  （VS Code の表示設定の問題であり、ローカル起動には影響しません）
+  * `apps/`
+  * `apis/`
+  * `packages/`
+
+が見えれば **閲覧準備は完了**です。
+
+👉 **ここまでで目的達成です**
+（以降は *任意*）
 
 ---
 
-## 4. 依存パッケージのインストール
-
-VS Code のターミナル（もしくは PowerShell）で、プロジェクトルート (`llmo-platform`) にいることを確認：
-
-```powershell
-PS C:\Users\<YourUserName>\Documents\llmo-platform>
-```
-
-### 4-1. pnpm でワークスペース全体をインストール
+## 5. 依存パッケージのインストール（起動したい場合のみ）
 
 ```powershell
 pnpm i -w
 ```
 
-* 初回はかなりのパッケージ（2000近く）が入るので数分かかることがあります。
-* `Done in XXs` の表示が出れば成功。
+* 初回は数分かかります
+* `Done in XXs` が出れば成功
 
 ---
 
-## 5. local-env の構成
+## 6. Docker / DB（起動したい場合のみ）
 
-通常、`local-env` ディレクトリには以下のファイルが存在します：
-
-```text
-local-env/
-  ├─ docker-compose.yml      # ローカル MySQL、CloudSQL proxy 等の定義
-  └─ start-all.sh            # 各サービスをまとめて起動するスクリプト
-```
-
-もし `local-env` が壊れたり、誤って削除した場合は Git で復元できます：
-
-```powershell
-git restore local-env
-# または古い Git:
-# git checkout HEAD -- local-env
-```
-
----
-
-## 6. Docker / DB / Prisma のセットアップ
-
-### 6-1. Docker Desktop の起動
-
-* Docker Desktop を起動（タスクトレイに 🐳 アイコンが出る）
-* PowerShell で動作確認：
+ 6-1. Docker 起動確認
 
 ```powershell
 docker --version
 ```
 
-バージョンが表示されれば OK。
-`docker : 用語 'docker' は…認識されません` と出る場合、
-Docker Desktop のインストール or PATH 設定を見直してください。
-
-### 6-2. ローカル MySQL（docker-compose）起動
+ 6-2. DB 起動
 
 ```powershell
 docker compose -f local-env/docker-compose.yml up -d
 ```
 
-* 初回起動時には MySQL イメージのダウンロードが走ります。
-* 成功すると `mysql` コンテナがバックグラウンドで起動。
-
-### 6-3. Prisma Client の生成
+ 6-3. Prisma Client 生成
 
 ```powershell
 pnpm db:generate
 ```
 
-* `Generated Prisma Client …` と表示されれば OK。
-
 ---
 
-## 7. 全サービス起動（Dashboard / Admin / API）
-
-WSL2 + bash が使える前提で、以下を実行：
+## 7. 全サービス起動（任意）
 
 ```powershell
 bash ./local-env/start-all.sh
 ```
 
-※ `./local-env/start-all.sh` だけでは Windows の PowerShell からは直接実行できないため、
-`bash` 経由で起動します。
+ アクセス先
 
-### 起動後のアクセス URL
-
-* Dashboard（ユーザー向け UI）
+* Dashboard
   [http://localhost:3001](http://localhost:3001)
-* Admin（管理画面）
+* Admin
   [http://localhost:3000](http://localhost:3000)
-* LLMO API（統合 API）
+* API
   [http://localhost:3002](http://localhost:3002)
 
 ---
 
-## 8. よくある質問・トラブルシュート
+## 8. よくあるトラブル
 
-### Q1. Explorer が空なのに、Source Control にはファイルが見える
+ Q. Explorer が空だが Source Control にファイルが見える
 
-* VS Code がフォルダとして開いていないか、Explorer が折りたたまれているケースです。
-* `code .` でフォルダを開いている & Source Control に `apps/` などが見えていれば、
-  **ローカル起動には支障ありません**。
-* Explorer 表示は必要に応じて整えればよいので、まずはローカル起動を優先して問題ありません。
+* 表示設定の問題です
+* **起動・閲覧には影響ありません**
 
 ---
 
-### Q2. `docker: 用語 'docker' は…認識されません` と出る
+ Q. `docker` が認識されない
 
-* Docker Desktop がインストールされていないか、PATH に追加されていません。
-
-  1. Docker Desktop をインストール
-  2. 再起動
-  3. `docker --version` で確認
-* 解決するまでは `docker compose` は実行できません。
+* Docker Desktop 未起動 or 未インストール
+* 再起動後に再確認
 
 ---
 
-### Q3. `open ... local-env/docker-compose.yml: The system cannot find the file specified.` と出る
-
-* `local-env/docker-compose.yml` が存在しません。
-* 誤操作で削除した可能性があります。
-* 以下で Git から復元してください：
+ Q. `local-env/docker-compose.yml` が無い
 
 ```powershell
 git restore local-env
-# または:
-# git checkout HEAD -- local-env
-```
-
-復元後、再度：
-
-```powershell
-docker compose -f local-env/docker-compose.yml up -d
 ```
 
 ---
 
-### Q4. `bash ./local-env/start-all.sh` で `execvpe(/bin/bash) failed: No such file or directory` と出る
+ Q. 本番や課金が不安
 
-* WSL2 がインストールされていないか、bash が存在しない状態です。
-* 管理者 PowerShell で：
+* API キーなし → 認証不可 → 課金不可
+* Read 権限のみ → 本番影響不可
 
-```powershell
-wsl --install
+---
+
+## 9. 最小フロー（閲覧だけ）
+
+```text
+1. git clone（または既存 clone を使う）
+2. cd llmo-platform
+3. code .
 ```
 
-* 再起動後、再度 `bash ./local-env/start-all.sh` を実行。
+これだけで **安全に repository を参照できます**。
 
 ---
 
-### Q5. 本番環境や API 課金が心配です
+ 補足
 
-* リポジトリには API キーや本番クレデンシャルは含まれていません。
-* `.env` も各自で用意しない限り、外部 API に認証付き通信はできません。
-* 認証できないリクエストは各プロバイダ側で拒否され、**課金対象になりません**。
-* GitHub に対しても Read のみで、Push / デプロイ権限はない前提のため、
-  **本番環境に影響を与えることはできません**。
+* 「とりあえず中身を見たい」
+* 「構成を把握したい」
+* 「仕様レビューしたい」
+
+👉 **この README の 4 章までで十分です**
 
 ---
 
-## 9. 最小運用フロー（おさらい）
+必要であれば次に
 
-1. GitHub から `llmo-platform` を clone
-2. `code .` で VS Code を開く
-3. `pnpm i -w` で依存インストール
-4. Docker Desktop & WSL2 をセットアップ
-5. `docker compose -f local-env/docker-compose.yml up -d`
-6. `pnpm db:generate`
-7. `bash ./local-env/start-all.sh`
-8. ブラウザで [http://localhost:3001](http://localhost:3001) を開き Dashboard を確認
+* **リポジトリ構成の読み方（apps / apis / packages）**
+* **どこから読めば全体像が分かるか**
+* **llmo-platform の論理アーキテクチャ図**
 
-以上で、**エンジニアでも本番に影響を与えず、安全に llmo-platform をローカルで起動・検証できる状態**になります。
-
+まで落としますが、いかがいたしましょうか。
