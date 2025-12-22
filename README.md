@@ -1,108 +1,137 @@
-ご提示いただいた最新情報（Codexのモデル選び、クラウド側からの同期方法など）をすべて反映させた、**完全版の README.md** を作成しました。
 
-これをコピーして、VS Codeの `README.md` に上書き保存してください。
 
------
-
+````markdown
 # VS Code + ChatGPT (Codex) による GAS 開発・運用ガイド
 
-Google Apps Script (GAS) を VS Code 上でローカル管理し、OpenAI の最新コーディングAI (Codex) を活用して効率的に修正・運用するための手順書です。
-
-## 📋 前提条件
-
-* **Node.js**: インストール済みであること
-* **VS Code**: 拡張機能「Codex - OpenAI's coding agent」を導入済みであること
-* **Google アカウント**: GAS 編集権限があること
-* **OpenAI アカウント**: ChatGPT Plus/Pro/Team などの有料プラン（API従量課金ではなく、プラン内で利用可能）
+本ドキュメントは、Google Apps Script（GAS）を  
+**VS Code 上でローカル管理**し、**ChatGPT（Codex）を活用して安全かつ効率的に修正・運用する**ための手順書です。
 
 ---
 
-## 🛠 1. 環境構築 (初回のみ)
+## 📋 前提条件
+
+- **Node.js**：インストール済み
+- **VS Code**：インストール済み  
+  - 拡張機能「Codex - OpenAI's coding agent」を導入済み
+- **Google アカウント**：対象 GAS プロジェクトの編集権限あり
+- **OpenAI アカウント**：ChatGPT Plus / Pro / Team などの有料プラン
+
+---
+
+## 🛠 1. 環境構築（初回のみ）
 
 ### 1-1. clasp のインストール
-GAS をローカルで管理するための Google 公式ツールをインストールします。
+
+Google Apps Script をローカル管理する公式 CLI ツールです。
 
 ```bash
 npm install -g @google/clasp
+````
 
 ### 1-2. Google ログイン
 
-ブラウザ認証を行い、PC と Google アカウントを紐付けます。
+ブラウザが開くので、GAS を所有・編集できる Google アカウントでログインします。
 
 ```bash
 clasp login
 ```
 
-### 1-3. プロジェクトの取得 (Clone)
+### 1-3. プロジェクトの取得（Clone）
 
-GAS の「プロジェクト設定」にある **スクリプトID** をコピーし、以下のコマンドでダウンロードします。
+GAS の「プロジェクト設定」にある **スクリプト ID** を使用します。
 
 ```bash
-# フォルダ作成
 mkdir my-gas-project
 cd my-gas-project
-
-# コードのダウンロード
 clasp clone <スクリプトID>
 ```
 
-> **⚠️ Windows ユーザーの注意**: GAS 上のファイル名に `*` `?` `/` などの記号が含まれているとダウンロードに失敗します。事前にブラウザ上の GAS エディタでファイル名を変更してください。
+#### ⚠️ Windows ユーザーの注意
 
------
+* GAS 側のファイル名に `* ? /` などが含まれていると clone に失敗します
+* 事前に **ブラウザ版 GAS エディタでファイル名を修正**してください
+
+---
+
+## 📂 重要：VS Code でフォルダを開く
+
+`clasp clone` は **VS Code とは無関係に** ファイルを生成します。
+**clone 後は必ず VS Code でフォルダを開き直してください。**
+
+### 推奨手順（確実）
+
+```powershell
+code C:\Users\xnakamura\my-gas-project
+```
+
+※ VS Code は「開いているフォルダ」しかエクスプローラーに表示しません。
+
+---
 
 ## 🔄 2. 日々の開発フロー
 
-### Step 1: 最新状態の同期 (Pull)
+### Step 1. 最新状態を取得（Pull）
 
-作業を始める前や、ブラウザ側で誰かが修正を行った場合は、必ず手元のコードを更新します。
-**※注意: 手元で保存していない変更がある状態で実行すると、上書きされて消える可能性があります。**
+ブラウザ側で変更が入っている可能性がある場合は、作業前に必ず実行します。
 
 ```bash
 clasp pull
 ```
 
-### Step 2: VS Code で編集 & AI 活用
+※ 未保存のローカル変更は上書きされるため注意してください。
 
-ファイルを開き、修正を行います。右側の Codex チャットパネルを活用してください。
+---
 
-#### 🤖 AIモデルの選び方
+### Step 2. VS Code で編集 & Codex 活用
 
-チャット欄のモデル選択プルダウンから用途に合わせて選択します。
+`.js` ファイルを編集し、Codex チャットパネルで修正・レビューを行います。
 
-  * **GPT-5.1-Codex-Max**: **推奨**。複雑なロジック解析、バグ修正、大規模なリファクタリングに最適。
-  * **GPT-5.1-Codex-Mini**: 高速。コメント追加や単純な構文修正向け。
-  * **GPT-5.1-Codex**: 標準モデル。
+#### 🤖 Codex モデルの使い分け
 
-### Step 3: クラウドへの反映 (Push)
+* **GPT-5.1-Codex-Max（推奨）**
+  複雑なロジック解析、GAS 特有の副作用を考慮した修正向け
+* **GPT-5.1-Codex-Mini**
+  コメント追加、軽微な修正、高速作業向け
+* **GPT-5.1-Codex**
+  標準用途
 
-修正が終わったら、以下のコマンドで Google のサーバーへアップロードします。
-**これを実行しないと、実際の GAS は更新されません。**
+---
+
+### Step 3. クラウドへ反映（Push）
+
+ローカルでの修正は **push しない限り GAS に反映されません**。
 
 ```bash
 clasp push
 ```
 
------
+---
 
 ## ⚠️ トラブルシューティング
 
-### Q. 「拡張機能が見つからない」と言われた
+### Q. VS Code にファイルが表示されない
 
-`clasp` は VS Code の拡張機能ではなく、ターミナルで動くツールです。コマンドライン（ターミナル）から操作してください。
+* フォルダを開いていない可能性があります
+* `code <project-path>` で開き直してください
 
-### Q. アップロード (Push) を忘れて動かない
+### Q. 保存したのに GAS が動かない
 
-VS Code で「保存 (Ctrl+S)」しただけでは GAS に反映されません。必ず `clasp push` を行ってください。
+* `Ctrl + S` はローカル保存のみです
+* 必ず `clasp push` を実行してください
 
 ### Q. 認証エラーが出る
 
-長期間使用していない場合、認証が切れることがあります。その際は再度 `clasp login` を実行してください。
+* 認証期限切れの可能性があります
 
------
+```bash
+clasp login
+```
 
-## 📂 除外設定 (.claspignore)
+---
 
-`.git` フォルダなどが Google ドライブにアップロードされないよう、プロジェクトルートに `.claspignore` ファイルを作成し、以下を記述してあります。
+## 📂 .claspignore（除外設定）
+
+以下は Google ドライブへアップロードされません。
 
 ```text
 .git/
@@ -112,20 +141,12 @@ README.md
 node_modules/
 ```
 
-````
-
 ---
 
-### 作業手順
-1.  VS Codeで `README.md` を開きます。
-2.  中身をすべて消して、上記のコードを貼り付けます。
-3.  保存 (`Ctrl + S`) します。
-4.  ターミナルで以下を実行して GitHub に更新を反映させます。
+## 📝 README 更新時の Git 操作
 
 ```powershell
 git add README.md
-git commit -m "Update README with latest Codex and sync instructions"
+git commit -m "Update README: GAS + VS Code + Codex workflow"
 git push
-````
-
-これでドキュメントも最新の状態になります！
+```
