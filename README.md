@@ -1,6 +1,3 @@
-
-
-````markdown
 # VS Code + ChatGPT (Codex) による GAS 開発・運用ガイド
 
 本ドキュメントは、Google Apps Script（GAS）を  
@@ -26,7 +23,7 @@ Google Apps Script をローカル管理する公式 CLI ツールです。
 
 ```bash
 npm install -g @google/clasp
-````
+
 
 ### 1-2. Google ログイン
 
