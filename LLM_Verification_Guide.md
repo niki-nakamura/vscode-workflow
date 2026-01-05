@@ -1,5 +1,4 @@
 
-```markdown
 # LLM API 疎通確認・検証手順 (Python / OpenRouter)
 
 VS Codeのターミナルのみを使用して、OpenAI互換API (OpenRouter) 経由でLLMの動作を検証するためのミニマム手順書です。
@@ -103,28 +102,3 @@ python test_prompt.py
 * `API_KEY` が間違っているか、OpenRouterのクレジットが不足している可能性があります。
 
 
-
-```
-
----
-
-### 保存とアップロードの手順
-
-`workflow` フォルダに移動して、ファイルを作成しGitHubへ上げます。
-
-```powershell
-# 1. workflowフォルダへ移動 (もし別の場所にいるなら)
-cd ..
-cd workflow
-
-# 2. ファイルを作成して上記の内容を貼り付け -> 保存して閉じる
-code LLM_Verification_Guide.md
-
-# 3. GitHubへプッシュ
-git add LLM_Verification_Guide.md
-git commit -m "Add LLM verification guide"
-git push
-
-```
-
-これで完了です！これで次回からはGitHub上のこのファイルを見るだけで手順を思い出せます。
