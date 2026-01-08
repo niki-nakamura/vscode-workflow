@@ -1,277 +1,150 @@
+これまでのトラブルシューティング（Git の強制リセット手順や、特定のアプリのみを起動する方法）を踏まえ、**「安全に閲覧する」** 手順と、**「確実に動く状態に戻して起動する」** 手順を明確に分けた、より実践的な README に書き直しました。
 
-# llmo-platform ローカル閲覧・起動手順（Windows）
-
-本ドキュメントは、
-**GMO 組織の Private Repository「llmo-platform」** を
-**自分の PC にクローンしてコードを参照できる状態にすること**を第一目的とし、
-必要に応じて **ローカル起動まで進められる** 手順をまとめたものです。
-
-> ✅ 本手順は **ローカル閲覧・検証専用** です
-> ✅ **本番環境・課金・データには一切影響しません**
-> ✅ まずは *clone → VS Code で閲覧* だけで完結して問題ありません
+そのままコピー＆ペーストして `.md` ファイルとして保存できる形式です。
 
 ---
 
-## 0. 安全性について（重要）
+# llmo-platform ローカル閲覧・起動ガイド（Windows）
 
-* `git clone` で取得するのは **コードのコピー** です
-  → 本番サーバーやクラウドへは **一切アクセスしません**
-* リポジトリには以下は **含まれていません**
+本ドキュメントは、**GMO 組織の Private Repository「llmo-platform」** を、安全かつ確実に手元の PC で閲覧・実行するための手順書です。
 
-  * OpenAI / Firecrawl / GA4 / Firebase 等の API キー
-  * 本番用 `.env`
-  * Service Account JSON
-* 認証情報が無いため
-
-  * 外部 API への **認証付き通信は不可**
-  * **課金は発生しません**
-* GitHub 権限が **Read のみ** の場合
-
-  * Push / Deploy / 本番反映は **不可能**
-
-👉 **安心して閲覧・ローカル実行して問題ありません**
+> **✅ 本手順の安全性について**
+> * **本番影響なし:** 本番データベースやサーバーには一切接続しません。
+> * **課金なし:** API キーが含まれていないため、課金は発生しません。
+> * **編集しても安心:** ローカルでファイルを書き換えても、GitHub への書き込み権限（Push）がなければ本番コードは変わりません。
+> 
+> 
 
 ---
 
-## 1. 前提条件
+## 📚 1. 閲覧だけしたい場合（推奨）
 
- 1-1. 権限
+コードの中身を確認したい、構成を把握したい場合は、以下の手順だけで完了です。
 
-* GitHub 組織 `gmo-am`
-* Private Repository
-  **`gmo-am/llmo-platform` に Read 権限**
+### 1-1. 前提ツール
 
-※ Fork / Push 権限は不要
+* [Git for Windows](https://git-scm.com/download/win)
+* [Visual Studio Code (VS Code)](https://code.visualstudio.com/)
 
----
+### 1-2. コードの取得（Clone）
 
- 1-2. 事前インストール（最低限）
-
-> 🔰 **閲覧だけなら ①② だけで OK**
-
-1. **Git for Windows**
-   [https://git-scm.com/download/win](https://git-scm.com/download/win)
-
-2. **Visual Studio Code**
-   [https://code.visualstudio.com/](https://code.visualstudio.com/)
-
-（以下は *起動したい場合のみ*）
-3. Node.js 22 系
-4. pnpm
-5. Docker Desktop（WSL2 有効）
-6. WSL2
-
----
-
-## 2. リポジトリをクローンする
-
- 2-1. PowerShell を起動
-
-Windows キー → `PowerShell`
-
----
-
- 2-2. 作業ディレクトリへ移動
-
-例（Documents 配下）：
+PowerShell を開き、以下のコマンドを実行します。
 
 ```powershell
-cd "C:\Users\<YourUserName>\Documents"
-```
+# 保存したい場所へ移動（例: ドキュメントフォルダ）
+cd "C:\Users\$env:USERNAME\Documents"
 
-あなたの環境例：
-
-```powershell
-cd "C:\Users\xnakamura\Documents"
-```
-
----
-
- 2-3. クローン
-
-```powershell
+# コードをダウンロード
 git clone https://github.com/gmo-am/llmo-platform.git
+
 ```
 
-成功すると以下の構造になります：
-
-```text
-llmo-platform/
- ├─ apis/
- ├─ apps/
- ├─ packages/
- ├─ local-env/
- ├─ infrastructure/
- ├─ scripts/
- └─ README.md
-```
-
----
-
-## 3. すでに clone 済みの場合（よくあるエラー）
-
- ❌ エラー例
-
-```text
-fatal: destination path 'llmo-platform' already exists and is not an empty directory.
-```
-
- ✔ 対処方法
-
-すでに clone 済みです。**再 clone は不要**です。
-
-```powershell
-cd llmo-platform
-```
-
-中身を確認：
-
-```powershell
-git status
-```
-
-```text
-On branch main
-nothing to commit, working tree clean
-```
-
-→ 正常です 👍
-
----
-
-## 4. VS Code でリポジトリを開く（閲覧目的）
-
- 4-1. PowerShell から起動（推奨）
+### 1-3. VS Code で開く
 
 ```powershell
 cd llmo-platform
 code .
+
 ```
 
- 4-2. 確認ポイント
-
-* VS Code タイトルに
-  **`llmo-platform — Visual Studio Code`**
-* 左ペイン（Explorer）に
-
-  * `apps/`
-  * `apis/`
-  * `packages/`
-
-が見えれば **閲覧準備は完了**です。
-
-👉 **ここまでで目的達成です**
-（以降は *任意*）
+VS Code が立ち上がり、フォルダ構成が見えれば **閲覧準備は完了** です。
 
 ---
 
-## 5. 依存パッケージのインストール（起動したい場合のみ）
+## 🚀 2. アプリを起動したい場合（開発・検証）
+
+ローカルで画面を操作したい場合は、追加のセットアップが必要です。
+
+### 2-1. 前提ツール
+
+* Node.js (v22 推奨)
+* pnpm (`npm install -g pnpm`)
+* Docker Desktop (起動しておくこと)
+
+### 2-2. 依存関係のインストール
+
+まず、必要なライブラリをインストールします。
 
 ```powershell
-pnpm i -w
+pnpm install
+
 ```
 
-* 初回は数分かかります
-* `Done in XXs` が出れば成功
+### 2-3. アプリケーションの起動
 
----
+本プロジェクトは複数のアプリが含まれています。目的に合わせてコマンドを使い分けてください。
 
-## 6. Docker / DB（起動したい場合のみ）
-
- 6-1. Docker 起動確認
+**🅰️ ダッシュボード（ユーザー画面）を起動する場合**
 
 ```powershell
-docker --version
+pnpm --filter "./apps/dashboard" dev
+
 ```
 
- 6-2. DB 起動
+→ ブラウザで [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) にアクセス
+
+**🅱️ 管理画面 (Admin) を起動する場合**
 
 ```powershell
-docker compose -f local-env/docker-compose.yml up -d
+pnpm --filter "./apps/admin" dev
+
 ```
 
- 6-3. Prisma Client 生成
+→ ブラウザで [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) (ポートが競合する場合はログを確認) にアクセス
+
+---
+
+## 🛠 3. トラブルシューティング（困ったときは）
+
+「エラーが出る」「フォルダがおかしい」「余計なファイルが増えた」など、環境が汚れてしまった場合は、以下の **【完全リセット手順】** を実行してください。
+
+**⚠️ 注意:** 自分で書いた未保存のコードは消えますが、確実に GitHub 上の最新の状態に戻ります。
+
+### 手順：ローカル環境の強制クリーンアップ
+
+VS Code のターミナルで順に実行してください。
 
 ```powershell
-pnpm db:generate
+# 1. 最新情報を取得
+git fetch origin
+
+# 2. 強制的にリモートと同じ状態にする（手元の変更を破棄）
+git reset --hard origin/main
+
+# 3. ゴミファイル（新規作成された不要ファイル）を削除
+git clean -fd
+
+# 4. ライブラリの再同期
+pnpm install
+
 ```
 
----
-
-## 7. 全サービス起動（任意）
-
-```powershell
-bash ./local-env/start-all.sh
-```
-
- アクセス先
-
-* Dashboard
-  [http://localhost:3001](http://localhost:3001)
-* Admin
-  [http://localhost:3000](http://localhost:3000)
-* API
-  [http://localhost:3002](http://localhost:3002)
+実行後、`git status` で `nothing to commit, working tree clean` と表示されれば正常です。
 
 ---
 
-## 8. よくあるトラブル
+## 📂 4. フォルダ構成の歩き方
 
- Q. Explorer が空だが Source Control にファイルが見える
+VS Code で見るべき主要なディレクトリです。
 
-* 表示設定の問題です
-* **起動・閲覧には影響ありません**
-
----
-
- Q. `docker` が認識されない
-
-* Docker Desktop 未起動 or 未インストール
-* 再起動後に再確認
+| ディレクトリ | 説明 |
+| --- | --- |
+| **`apps/dashboard`** | ユーザー向けチャット画面のソースコード (Nuxt) |
+| **`apps/admin`** | 管理者向け設定画面のソースコード (Nuxt) |
+| **`packages/`** | 共通で使用されるロジックや型定義 |
+| **`apis/`** | バックエンド API (Python/FastAPI 等が含まれる場合) |
 
 ---
 
- Q. `local-env/docker-compose.yml` が無い
+### 次のアクション
 
-```powershell
-git restore local-env
-```
+とりあえず画面を動かしてみたい方は **「2-3. アプリケーションの起動」** のコマンドを試してください。
 
 ---
 
- Q. 本番や課金が不安
+### 修正のポイント
 
-* API キーなし → 認証不可 → 課金不可
-* Read 権限のみ → 本番影響不可
-
----
-
-## 9. 最小フロー（閲覧だけ）
-
-```text
-1. git clone（または既存 clone を使う）
-2. cd llmo-platform
-3. code .
-```
-
-これだけで **安全に repository を参照できます**。
-
----
-
- 補足
-
-* 「とりあえず中身を見たい」
-* 「構成を把握したい」
-* 「仕様レビューしたい」
-
-👉 **この README の 4 章までで十分です**
-
----
-
-必要であれば次に
-
-* **リポジトリ構成の読み方（apps / apis / packages）**
-* **どこから読めば全体像が分かるか**
-* **llmo-platform の論理アーキテクチャ図**
-
-まで落としますが、いかがいたしましょうか。
+1. **「閲覧（Lv.1）」と「起動（Lv.2）」の完全分離:** 閲覧だけしたい人が、Docker や pnpm のエラーでつまづかないようにしました。
+2. **`git reset` 手順の標準化:** 今回解決に役立った「強制リセット＆クリーン」を、トラブルシューティングの第一手として記載しました。
+3. **具体的な起動コマンド:** 汎用的なスクリプトではなく、今回成功した `pnpm --filter` を明記し、ダッシュボードと管理画面を区別しました。
+4. **`$env:USERNAME` の使用:** Windows ユーザー名部分を自動補完する書き方に変更し、コピペしやすくしました。
