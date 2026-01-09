@@ -1,6 +1,6 @@
 
 
-Microsoft Amplifier 開発スタート手順（0→開始まで / 非エンジニア向け）
+Microsoft Amplifier 開発スタート手順（0→開始まで）
 
 これは何？
 
