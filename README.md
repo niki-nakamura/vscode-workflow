@@ -1,30 +1,78 @@
 
-# VS Code + ChatGPT (Codex) による GAS 開発・運用ガイド
+
+## クイックリファレンス（よく使うコマンド）
+
+日々の作業は基本的にこの順序で行います。
+
+**1. 作業開始（フォルダ移動 & VS Code起動）**
+
+> **重要:** 必ず作業フォルダに移動してから VS Code を開いてください。
+
+```powershell
+cd C:\Users\xnakamura\gas-project-management
+code .
+
+```
+
+**2. 最新コードの取得（編集前に必ず実行）**
+
+> クラウド上の最新状態をローカルに落とします。
+
+```bash
+clasp pull
+
+```
+
+**3. 変更の反映（保存後に実行）**
+
+> VS Code で編集・保存（Ctrl+S）した後、クラウドへアップロードします。
+
+```bash
+clasp push
+
+```
+
+**4. 困ったときの確認**
+
+> 「何が変更されたか？」を確認します。
+
+```bash
+clasp status
+
+```
+
+---
+
+## 0. 用語と前提の理解
 
 本ドキュメントは、Google Apps Script（GAS）を VS Code 上でローカル管理し、ChatGPT（Codex）を活用して安全かつ効率的に修正・運用するための手順書です。
 基本方針は「クラウド（Apps Script）とローカル（VS Code）を clasp で同期し、編集は必ずローカルで行い、反映は必ず push で行う」です。
 
-## 0. 用語と前提の理解
+* **clasp**
+* Google 公式の Apps Script CLI。クラウドの GAS とローカルフォルダを同期する。
 
-* clasp
 
-  * Google 公式の Apps Script CLI。クラウドの GAS とローカルフォルダを同期する。
-* clone
+* **clone**
+* 初回のみ実行する「プロジェクトの紐づけ（.clasp.json の作成）＋クラウドからファイル取得」。
 
-  * 初回のみ実行する「プロジェクトの紐づけ（.clasp.json の作成）＋クラウドからファイル取得」。
-* pull
 
-  * クラウド → ローカルへ最新を取得する。
-* push
+* **pull**
+* クラウド → ローカルへ最新を取得する。
 
-  * ローカル → クラウドへ変更を反映する。
-* 「Project settings not found.」
 
-  * そのフォルダに `.clasp.json` がない。同期対象の設定が存在しないため pull/push はできない。
-* 重要：URL の projectId と scriptId は別物になり得る
+* **push**
+* ローカル → クラウドへ変更を反映する。
 
-  * Apps Script の画面URLに出るID（projects/…）と、プロジェクト設定にある「スクリプトID（scriptId）」は一致しない場合がある。
-  * 原則、clasp は「スクリプトID（scriptId）」を使うのが安全。
+
+* **「Project settings not found.」**
+* そのフォルダに `.clasp.json` がない。同期対象の設定が存在しないため pull/push はできない。
+
+
+* **重要：URL の projectId と scriptId は別物になり得る**
+* Apps Script の画面URLに出るID（projects/…）と、プロジェクト設定にある「スクリプトID（scriptId）」は一致しない場合がある。
+* 原則、clasp は「スクリプトID（scriptId）」を使うのが安全。
+
+
 
 ## 1. 前提条件
 
@@ -42,6 +90,7 @@
 
 ```bash
 npm install -g @google/clasp
+
 ```
 
 確認：
@@ -50,6 +99,7 @@ npm install -g @google/clasp
 clasp -v
 # または
 clasp --version
+
 ```
 
 ### 2-2. Google ログイン
@@ -58,6 +108,7 @@ clasp --version
 
 ```bash
 clasp login
+
 ```
 
 注意：
@@ -69,6 +120,7 @@ clasp login
 ```bash
 clasp logout
 clasp login
+
 ```
 
 ### 2-3. Apps Script API を有効化
@@ -109,6 +161,7 @@ Apps Script 側のファイル名（左のファイル一覧）に上記が含�
 mkdir C:\Users\xnakamura\gas-project-management
 cd C:\Users\xnakamura\gas-project-management
 clasp clone <スクリプトID>
+
 ```
 
 成功時の目安：
@@ -123,6 +176,7 @@ clasp clone <スクリプトID>
 cd C:\Users\xnakamura\gas-project-management
 dir -Force
 type .clasp.json
+
 ```
 
 `.clasp.json` が無い場合は clone が完了していない。pull/push はできない。
@@ -142,6 +196,7 @@ VS Code は「いま開いているフォルダ」しか編集対象にならな
 ```powershell
 cd C:\Users\xnakamura\gas-project-management
 code .
+
 ```
 
 確認ポイント：
@@ -160,6 +215,7 @@ code .
 
 ```powershell
 clasp pull
+
 ```
 
 意味：
@@ -176,14 +232,16 @@ clasp pull
 
 ```powershell
 clasp push
+
 ```
 
 意味：
 
 * ローカルの差分をクラウドへ反映する。
 * 差分がなければ push は行われず、以下のように出ることがある：
+* Script is already up to date.
 
-  * Script is already up to date.
+
 
 4. ブラウザの Apps Script エディタで確認
 
@@ -203,6 +261,7 @@ clasp push
 
 ```powershell
 clasp status
+
 ```
 
 * Tracked files は clasp が同期管理しているファイル一覧。
@@ -213,7 +272,7 @@ clasp status
 * 編集していない
 * 保存していない
 * 別フォルダを編集している
-  のいずれか。
+のいずれか。
 
 ### 5-2. 最小の確認（1行テスト）で経路を確定する
 
@@ -331,6 +390,7 @@ clasp status
 README.md
 .vscode/
 node_modules/
+
 ```
 
 ## 9. Git 管理（任意）
@@ -341,8 +401,11 @@ node_modules/
 git add .
 git commit -m "Update GAS scripts"
 git push
+
 ```
 
 ---
 
-必要であれば、この README に「このプロジェクトでの定型コマンド（フォルダパス固定版）」を追記した版（あなたの環境パスに完全固定）も作れます。
+### 次のステップ
+
+もし、このコマンドリストを印刷用（PDFなど）に整形したり、特定のコマンド（例: `clasp push --watch` など）を追加したい場合はお知らせください。
